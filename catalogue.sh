@@ -43,7 +43,7 @@ VALIDATE $? "installing nodejs"
 useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOGS_FILE
 VALIDATE $? "creating system user"
 
-mkdir -P /app &>>$LOGS_FILE
+mkdir -p /app &>>$LOGS_FILE
 VALIDATE $? "creating app directory"
 
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>>$LOGS_FILE
