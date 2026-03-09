@@ -57,6 +57,9 @@ VALIDATE $? "downling catalogue application"
 cd /app &>>$LOGS_FILE
 VALIDATE $? "changing to app directory"
 
+rm -rf /app/*
+VALIDATE $? "removing files"
+
 unzip /tmp/catalogue.zip &>>$LOGS_FILE
 VALIDATE $? "unzip catalogue"
 
