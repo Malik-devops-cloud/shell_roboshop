@@ -11,6 +11,7 @@ N="\e[37m"
 LOGS_FOLDER="/var/log/shell-roboshop"
 SCRIPT_NAME=$( echo $0 | cut -d "." -f1 )
 MONGODB_HOST="mongodb.devsql.store"
+SCRIPT_DIR=$PWD
 LOGS_FILE="$LOGS_FOLDER/$SCRIPT_NAME.log"
 
 mkdir -p $LOGS_FOLDER
@@ -43,22 +44,23 @@ useradd --system --home /app --shell /sbin/nologin --comment "roboshop system us
 VALIDATE $? "creating system user"
 
 mkdir /app &>>$LOGS_FILE
-VALIADATE $? "creating app directory"
+VALIDATE $? "creating app directory"
 
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>>$LOGS_FILE
 VALIDATE $? "downling catalogue application"
 
 cd /app &>>$LOGS_FILE
-VALIATE $? "changing to app directory"
+VALIDATE $? "changing to app directory"
 
 unzip /tmp/catalogue.zip &>>$LOGS_FILE
 VALIDATE $? "unzip catalogue"
 
 cd /app 
+VALIADATE $? "changing to app directory"
 npm install &>>$LOGS_FILE
 VALIDATE $? "install dependencies"
 
-cp catalogue.service /etc/systemd/system/catalogue.service &>>$LOGS_FILE
+cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service &>>$LOGS_FILE
 VALIDATE $? "copy catalogue.service"
 systemctl daemon-reload &>>$LOGS_FILE
 VALIDATE $? "daemon-reload"
