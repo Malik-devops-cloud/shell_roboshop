@@ -81,7 +81,14 @@ cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOGS_FILE
 VALIDATE $? "copy mongo repo"
 dnf install mongodb-mongosh -y &>>$LOGS_FILE
 VALIDATE $? "install mongo repo"
-mongosh --host $MONGODB_HOST </app/db/master-data.js &>>$LOGS_FILE
+
+INDEX=$(mongosh mongodb.devsql.store --quiet --eval "db.getMongo().getDBNames().index of ('catalogue')")
+if [$INDEX -lt 0 ]; then
+   mongosh --host $MONGODB_HOST </app/db/master-data.js &>>$LOGS_FILE
+else
+   echo -e "catalogue products already exists ... $Y SKIPPING $N"
+fi
+
 VALIDATE $? "validate catalogue products" 
 systemctl restart catalogue &>>$LOGS_FILE
 VALIDATE $? "restart catalogue"
