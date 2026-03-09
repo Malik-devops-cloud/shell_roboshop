@@ -22,17 +22,17 @@ fi
 
 VALIDATE() { 
 if [ $1 -ne 0 ]; then
-   echo -e "error::installing $2  $R failure $N" | tee -a $LOGS_FILE
+   echo -e "error:: $2  $R failure $N" | tee -a $LOGS_FILE
    exit 1
 else
-   echo -e "installing $2 is $G success $N" | tee -a $LOGS_FILE
+   echo -e " $2 is $G success $N" | tee -a $LOGS_FILE
 fi   
 }
 
 cp mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOGS_FILE
 VALIDATE $? "adding mongo repo"
 
-dnf install mongodb-org-org -y &>>$LOGS_FILE
+dnf install mongodb-org -y &>>$LOGS_FILE
 VALIDATE $? "installing mongodb"
 
 systemctl enable mongod &>>$LOGS_FILE
