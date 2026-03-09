@@ -16,8 +16,8 @@ for instance in $@
        RECORD_NAME="$instance"
     fi
     
-    echo "$insatance=$IP"
-    
+    echo "$insatance = $IP"
+
     aws route53 change-resource-record-sets \
   --hosted-zone-id $HOST_ID \
   --change-batch '
