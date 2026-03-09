@@ -64,7 +64,7 @@ unzip /tmp/catalogue.zip &>>$LOGS_FILE
 VALIDATE $? "unzip catalogue"
 
 cd /app 
-VALIADATE $? "changing to app directory"
+VALIDATE $? "changing to app directory"
 npm install &>>$LOGS_FILE
 VALIDATE $? "install dependencies"
 
@@ -77,7 +77,7 @@ VALIDATE $? "enable catalogue"
 systemctl start catalogue &>>$LOGS_FILE
 VALIDATE $? "start catalogue"
 
-cp mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOGS_FILE
+cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOGS_FILE
 VALIDATE $? "copy mongo repo"
 dnf install mongodb-mongosh -y &>>$LOGS_FILE
 VALIDATE $? "install mongo repo"
