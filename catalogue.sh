@@ -41,7 +41,7 @@ dnf  install nodejs -y &>>$LOGS_FILE
 VALIDATE $? "installing nodejs"
 
 id roboshop 
-if [$? -ne 0 ]; then
+if [ $? -ne 0 ]; then
     useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOGS_FILE
     VALIDATE $? "creating system user"
 else
@@ -82,7 +82,7 @@ VALIDATE $? "copy mongo repo"
 dnf install mongodb-mongosh -y &>>$LOGS_FILE
 VALIDATE $? "install mongo repo"
 
-INDEX=$(mongosh mongodb.devsql.store --quiet --eval "db.getMongo().getDBNames().indexof('catalogue')")
+INDEX=$(mongosh mongodb.devsql.store --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')")
 if [ $INDEX -le 0 ]; then
    mongosh --host $MONGODB_HOST </app/db/master-data.js &>>$LOGS_FILE
 else
