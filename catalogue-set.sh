@@ -2,6 +2,8 @@
 
 USERID=$(id -u)
 
+set -euo pipefail #this is the exit if error occurs
+trap 'error"there is error in $LINENO,command is :$BASH_COMMAND"' ERR
 
 R="\e[31m"
 G="\e[32m"
@@ -22,73 +24,48 @@ if [ $USERID -ne 0 ]; then
    exit 1
 fi   
 
-VALIDATE() { 
-if [ $1 -ne 0 ]; then
-   echo -e "error:: $2  $R failure $N" | tee -a $LOGS_FILE
-   exit 1
-else
-   echo -e " $2 is $G success $N" | tee -a $LOGS_FILE
-fi   
-}
 
 dnf module disable nodejs -y &>>$LOGS_FILE
-VALIDATE $? "disabling nodejs"
-
-dnf module enable nodejs:20 -y
-VALIDATE $? "enabling nodejs:20" &>>$LOGS_FILE
-
+dnf module enable nodejs:20 -y &>>$LOGS_FILE
 dnf  install nodejs -y &>>$LOGS_FILE
-VALIDATE $? "installing nodejs"
+ech0 -e "nodejs package setup completed ...$G SUCCESS $N"
 
 id roboshop 
 if [$? -ne 0 ]; then
     useradd --system --home /app --shell /sbin/nologin --comment "roboshop system user" roboshop &>>$LOGS_FILE
-    VALIDATE $? "creating system user"
+    
 else
     echo -e "user already exists ... $Y SKIPPING $N"
 fi
 
 mkdir -p /app &>>$LOGS_FILE
-VALIDATE $? "creating app directory"
-
 curl -o /tmp/catalogue.zip https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip &>>$LOGS_FILE
-VALIDATE $? "downling catalogue application"
-
 cd /app &>>$LOGS_FILE
-VALIDATE $? "changing to app directory"
 
 rm -rf /app/*
-VALIDATE $? "removing files"
-
 unzip /tmp/catalogue.zip &>>$LOGS_FILE
-VALIDATE $? "unzip catalogue"
 
 cd /app 
-VALIDATE $? "changing to app directory"
 npm install &>>$LOGS_FILE
-VALIDATE $? "install dependencies"
+
 
 cp $SCRIPT_DIR/catalogue.service /etc/systemd/system/catalogue.service &>>$LOGS_FILE
-VALIDATE $? "copy catalogue.service"
 systemctl daemon-reload &>>$LOGS_FILE
-VALIDATE $? "daemon-reload"
 systemctl enable catalogue &>>$LOGS_FILE
-VALIDATE $? "enable catalogue"
 systemctl start catalogue &>>$LOGS_FILE
-VALIDATE $? "start catalogue"
+echo -e "catalogue started .. $G SUCCESS $N"
 
 cp $SCRIPT_DIR/mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOGS_FILE
-VALIDATE $? "copy mongo repo"
 dnf install mongodb-mongosh -y &>>$LOGS_FILE
-VALIDATE $? "install mongo repo"
+echo -e "mongodb installed successfully"
 
 INDEX=$(mongosh mongodb.devsql.store --quiet --eval "db.getMongo().getDBNames().index of ('catalogue')")
-if [ $INDEX -lt 0 ]; then
+if [$INDEX -lt 0 ]; then
    mongosh --host $MONGODB_HOST </app/db/master-data.js &>>$LOGS_FILE
 else
    echo -e "catalogue products already exists ... $Y SKIPPING $N"
 fi
 
-VALIDATE $? "validate catalogue products" 
+
 systemctl restart catalogue &>>$LOGS_FILE
-VALIDATE $? "restart catalogue"
+echo -e "catalog products loaded successfully ... $G success $N"
