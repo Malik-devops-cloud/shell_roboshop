@@ -82,8 +82,8 @@ VALIDATE $? "copy mongo repo"
 dnf install mongodb-mongosh -y &>>$LOGS_FILE
 VALIDATE $? "install mongo repo"
 
-INDEX=$(mongosh mongodb.devsql.store --quiet --eval "db.getMongo().getDBNames().index of ('catalogue')")
-if [ $INDEX -lt 0 ]; then
+INDEX=$(mongosh mongodb.devsql.store --quiet --eval "db.getMongo().getDBNames().indexof('catalogue')")
+if [ $INDEX -le 0 ]; then
    mongosh --host $MONGODB_HOST </app/db/master-data.js &>>$LOGS_FILE
 else
    echo -e "catalogue products already exists ... $Y SKIPPING $N"
